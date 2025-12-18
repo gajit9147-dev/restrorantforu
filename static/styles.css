@@ -528,3 +528,51 @@ h4 {
 .mb-3 {
     margin-bottom: var(--space-lg);
 }
+
+/* ===== Add to Cart Button ===== */
+.add-to-cart-btn {
+    width: 100%;
+    padding: var(--space-sm) var(--space-md);
+    background: var(--primary);
+    color: white;
+    border: none;
+    border-radius: var(--radius-sm);
+    font-weight: 600;
+    font-size: 0.95rem;
+    cursor: pointer;
+    transition: var(--transition);
+    margin-top: var(--space-sm);
+}
+
+.add-to-cart-btn:hover {
+    background: var(--primary-dark);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+}
+
+.add-to-cart-btn:active {
+    transform: translateY(0);
+}
+
+/* ===== Toast Notification Animations ===== */
+@keyframes slideIn {
+    from {
+        transform: translateX(400px);
+        opacity: 0;
+    }
+
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+@keyframes fadeOut {
+    from {
+        opacity: 1;
+    }
+
+    to {
+        opacity: 0;
+    }
+}

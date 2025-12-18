@@ -192,6 +192,17 @@ def get_info():
 
 if __name__ == '__main__':
     print("Starting Restaurant Web Application...")
-    print("Server running at: http://localhost:5000")
     print("AI Agent (GastroGuide) enabled and ready!")
-    app.run(debug=True, host='0.0.0.0', port=5000)
+    
+    # Get port from environment variable (for deployment) or use 5000 (for local)
+    port = int(os.getenv('PORT', 5000))
+    
+    # Determine if we're in production
+    is_production = os.getenv('FLASK_ENV') == 'production'
+    
+    if is_production:
+        print(f"Server running in PRODUCTION mode on port {port}")
+        app.run(host='0.0.0.0', port=port, debug=False)
+    else:
+        print(f"Server running in DEVELOPMENT mode at: http://localhost:{port}")
+        app.run(debug=True, host='0.0.0.0', port=port)
