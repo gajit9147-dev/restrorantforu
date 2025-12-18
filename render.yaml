@@ -1,0 +1,10 @@
+services:
+  - type: web
+    name: restaurant-app
+    env: python
+    plan: free
+    buildCommand: |
+      python --version
+      pip install --upgrade pip
+      pip install -r requirements.txt
+    startCommand: gunicorn app:app
