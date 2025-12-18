@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - Mediterranean Delight</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        .dashboard-header {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            border-radius: var(--radius-lg);
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: var(--bg-secondary);
+            padding: 1.5rem;
+            border-radius: var(--radius-md);
+            text-align: center;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        .stat-label {
+            color: var(--text-secondary);
+            margin-top: 0.5rem;
+        }
+
+        .bookings-table {
+            background: var(--bg-secondary);
+            border-radius: var(--radius-md);
+            overflow: hidden;
+            box-shadow: var(--shadow-md);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        thead {
+            background: var(--primary);
+            color: white;
+        }
+
+        th {
+            padding: 1rem;
+            text-align: left;
+            font-weight: 600;
+        }
+
+        td {
+            padding: 1rem;
+            border-bottom: 1px solid var(--border);
+            color: var(--text-primary);
+        }
+
+        tbody tr:hover {
+            background: var(--bg-tertiary);
+        }
+
+        .status-badge {
+            padding: 0.25rem 0.75rem;
+            border-radius: var(--radius-sm);
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+
+        .status-confirmed {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status-cancelled {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .notification {
+            position: fixed;
+            top: 100px;
+            right: 30px;
+            background: var(--success);
+            color: white;
+            padding: 1rem 1.5rem;
+            border-radius: var(--radius-md);
+            box-shadow: var(--shadow-lg);
+            animation: slideIn 0.3s ease;
+            z-index: 10000;
+            display: none;
+        }
+
+        .notification.show {
+            display: block;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(400px);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        .refresh-btn {
+            background: var(--accent);
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: var(--radius-md);
+            cursor: pointer;
+            font-weight: 600;
+            transition: var(--transition);
+        }
+
+        .refresh-btn:hover {
+            background: #2980b9;
+        }
+
+        .no-bookings {
+            text-align: center;
+            padding: 3rem;
+            color: var(--text-secondary);
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="/" class="nav-logo">
+                🍽️ Mediterranean Delight
+            </a>
+            <ul class="nav-menu">
+                <li><a href="/" class="nav-link">Home</a></li>
+                <li><a href="/menu.html" class="nav-link">Menu</a></li>
+                <li><a href="/booking.html" class="nav-link">Book Table</a></li>
+                <li><a href="/admin.html" class="nav-link">Admin</a></li>
+                <li><button class="theme-toggle" id="theme-toggle">🌙</button></li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="container">
+        <!-- Dashboard Header -->
+        <div class="dashboard-header">
+            <h1>📊 Admin Dashboard</h1>
+            <p>Manage all restaurant bookings in real-time</p>
+        </div>
+
+        <!-- Stats Section -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-number" id="total-bookings">0</div>
+                <div class="stat-label">Total Bookings</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="confirmed-bookings">0</div>
+                <div class="stat-label">Confirmed</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="cancelled-bookings">0</div>
+                <div class="stat-label">Cancelled</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="todays-bookings">0</div>
+                <div class="stat-label">Today's Bookings</div>
+            </div>
+        </div>
+
+        <!-- Controls -->
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+            <h2>All Bookings</h2>
+            <button class="refresh-btn" onclick="loadBookings()">
+                🔄 Refresh
+            </button>
+        </div>
+
+        <!-- Bookings Table -->
+        <div class="bookings-table">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Booking ID</th>
+                        <th>Customer</th>
+                        <th>Email</th>
+                        <th>Phone</th>
+                        <th>Date</th>
+                        <th>Time</th>
+                        <th>Guests</th>
+                        <th>Table</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody id="bookings-tbody">
+                    <tr>
+                        <td colspan="9" class="no-bookings">Loading bookings...</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Notification Toast -->
+    <div class="notification" id="notification">
+        <strong>🔔 New Booking!</strong>
+        <p id="notification-text"></p>
+    </div>
+
+    <script src="app.js"></script>
+    <script>
+        let previousBookingCount = 0;
+
+        async function loadBookings() {
+            try {
+                const response = await fetch('/api/admin/bookings');
+                const data = await response.json();
+
+                if (data.success) {
+                    displayBookings(data.bookings);
+                    updateStats(data.bookings);
+
+                    // Check for new bookings
+                    if (previousBookingCount > 0 && data.count > previousBookingCount) {
+                        const newBooking = data.bookings[0]; // Most recent
+                        showNotification(`New booking from ${newBooking.customer} for ${newBooking.date} at ${newBooking.time}`);
+                    }
+
+                    previousBookingCount = data.count;
+                } else {
+                    console.error('Failed to load bookings:', data.error);
+                }
+            } catch (error) {
+                console.error('Error loading bookings:', error);
+            }
+        }
+
+        function displayBookings(bookings) {
+            const tbody = document.getElementById('bookings-tbody');
+
+            if (bookings.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="9" class="no-bookings">No bookings yet</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = bookings.map(booking => `
+                <tr>
+                    <td><strong>${booking.id}</strong></td>
+                    <td>${booking.customer}</td>
+                    <td>${booking.email || 'N/A'}</td>
+                    <td>${booking.phone || 'N/A'}</td>
+                    <td>${booking.date}</td>
+                    <td>${booking.time}</td>
+                    <td>${booking.guests}</td>
+                    <td>${booking.table_pref || 'Any'}</td>
+                    <td><span class="status-badge status-${booking.status}">${booking.status}</span></td>
+                </tr>
+            `).join('');
+        }
+
+        function updateStats(bookings) {
+            const today = new Date().toISOString().split('T')[0];
+
+            const confirmed = bookings.filter(b => b.status === 'confirmed').length;
+            const cancelled = bookings.filter(b => b.status === 'cancelled').length;
+            const todaysBookings = bookings.filter(b => b.date === today && b.status === 'confirmed').length;
+
+            document.getElementById('total-bookings').textContent = bookings.length;
+            document.getElementById('confirmed-bookings').textContent = confirmed;
+            document.getElementById('cancelled-bookings').textContent = cancelled;
+            document.getElementById('todays-bookings').textContent = todaysBookings;
+        }
+
+        function showNotification(message) {
+            const notification = document.getElementById('notification');
+            const text = document.getElementById('notification-text');
+
+            text.textContent = message;
+            notification.classList.add('show');
+
+            // Play notification sound (optional)
+            // const audio = new Audio('/notification.mp3');
+            // audio.play();
+
+            // Hide after 5 seconds
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 5000);
+        }
+
+        // Load bookings on page load
+        loadBookings();
+
+        // Auto-refresh every 10 seconds to check for new bookings
+        setInterval(loadBookings, 10000);
+    </script>
+</body>
+
+</html>

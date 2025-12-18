@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Our Menu - Mediterranean Delight</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="chatbot.css">
+    <link rel="stylesheet" href="cart.css">
+</head>
+
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="/" class="nav-logo">
+                🍽️ Mediterranean Delight
+            </a>
+            <ul class="nav-menu">
+                <li><a href="/" class="nav-link">Home</a></li>
+                <li><a href="/menu.html" class="nav-link">Menu</a></li>
+                <li><a href="/booking.html" class="nav-link">Book Table</a></li>
+                <li><button class="theme-toggle" id="theme-toggle">🌙</button></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Menu Header -->
+    <section class="hero" style="min-height: 30vh; padding: 3rem 1rem;">
+        <div class="hero-content">
+            <h1>Our Menu</h1>
+            <p>Explore our delicious Mediterranean dishes</p>
+        </div>
+    </section>
+
+    <!-- Menu Section -->
+    <section class="section">
+        <div class="container">
+            <!-- Loading State -->
+            <div id="loading" class="text-center">
+                <p>Loading menu...</p>
+            </div>
+
+            <!-- Menu Items -->
+            <div id="menu-container" style="display: none;">
+                <!-- Appetizers -->
+                <div class="menu-category" id="category-appetizers">
+                    <h2 class="section-title">🥗 Appetizers</h2>
+                    <div class="card-grid" id="appetizers-grid"></div>
+                </div>
+
+                <!-- Main Course -->
+                <div class="menu-category mt-3" id="category-main">
+                    <h2 class="section-title">🍽️ Main Course</h2>
+                    <div class="card-grid" id="main-grid"></div>
+                </div>
+
+                <!-- Desserts -->
+                <div class="menu-category mt-3" id="category-desserts">
+                    <h2 class="section-title">🍰 Desserts</h2>
+                    <div class="card-grid" id="desserts-grid"></div>
+                </div>
+
+                <!-- Drinks -->
+                <div class="menu-category mt-3" id="category-drinks">
+                    <h2 class="section-title">🍹 Drinks</h2>
+                    <div class="card-grid" id="drinks-grid"></div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-content">
+            <p>© 2024 Mediterranean Delight. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script src="app.js"></script>
+    <script src="cart.js"></script>
+    <script src="chatbot.js"></script>
+    <script>
+        // Load menu items
+        async function loadMenu() {
+            try {
+                const response = await fetch('/api/menu');
+                const data = await response.json();
+
+                if (data.success) {
+                    displayMenu(data.menu);
+                    document.getElementById('loading').style.display = 'none';
+                    document.getElementById('menu-container').style.display = 'block';
+                } else {
+                    document.getElementById('loading').innerHTML = '<p>Error loading menu. Please try again later.</p>';
+                }
+            } catch (error) {
+                console.error('Error loading menu:', error);
+                document.getElementById('loading').innerHTML = '<p>Error loading menu. Please try again later.</p>';
+            }
+        }
+
+        function displayMenu(items) {
+            const categories = {
+                'Appetizers': document.getElementById('appetizers-grid'),
+                'Main Course': document.getElementById('main-grid'),
+                'Desserts': document.getElementById('desserts-grid'),
+                'Drinks': document.getElementById('drinks-grid')
+            };
+
+            items.forEach(item => {
+                const grid = categories[item.category];
+                if (grid) {
+                    const imagePath = item.image ? `/images/${item.image}` : '';
+                    const menuItemHTML = `
+                        <div class="menu-item">
+                            <img src="${imagePath}" alt="${item.name}" class="menu-image" 
+                                 onerror="this.style.background='linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%)'; this.src='';">
+                            <div class="menu-content">
+                                <div class="menu-category">${item.category}</div>
+                                <div class="menu-header">
+                                    <h3 class="menu-name">${item.name}</h3>
+                                    <span class="menu-price">$${item.price.toFixed(2)}</span>
+                                </div>
+                                <p class="menu-description">${item.description}</p>
+                                <button class="add-to-cart-btn" onclick="addToCart(${item.id}, '${item.name.replace(/'/g, "\\'")}', ${item.price}, '${item.image}', '${item.category}')">
+                                    🛒 Add to Cart
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                    grid.insertAdjacentHTML('beforeend', menuItemHTML);
+                }
+            });
+        }
+
+        // Add to cart function
+        function addToCart(id, name, price, image, category) {
+            cart.addItem({ id, name, price, image, category });
+        }
+
+        // Load menu when page loads
+        loadMenu();
+    </script>
+</body>
+
+</html>

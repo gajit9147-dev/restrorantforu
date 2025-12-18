@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Book a Table - Mediterranean Delight</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="chatbot.css">
+</head>
+
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="/" class="nav-logo">
+                🍽️ Mediterranean Delight
+            </a>
+            <ul class="nav-menu">
+                <li><a href="/" class="nav-link">Home</a></li>
+                <li><a href="/menu.html" class="nav-link">Menu</a></li>
+                <li><a href="/booking.html" class="nav-link">Book Table</a></li>
+                <li><button class="theme-toggle" id="theme-toggle">🌙</button></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Booking Header -->
+    <section class="hero" style="min-height: 30vh; padding: 3rem 1rem;">
+        <div class="hero-content">
+            <h1>Book a Table</h1>
+            <p>Reserve your spot for an unforgettable dining experience</p>
+        </div>
+    </section>
+
+    <!-- Booking Form Section -->
+    <section class="section">
+        <div class="container">
+            <div class="card" style="max-width: 700px; margin: 0 auto;">
+                <form id="booking-form">
+                    <div class="form-group">
+                        <label class="form-label" for="customer">Your Name *</label>
+                        <input type="text" class="form-input" id="customer" name="customer" required
+                            placeholder="John Doe">
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" for="email">Email Address *</label>
+                        <input type="email" class="form-input" id="email" name="email" required
+                            placeholder="john@example.com">
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" for="phone">Phone Number (digits only)</label>
+                        <input type="tel" class="form-input" id="phone" name="phone" pattern="[0-9]{10,15}"
+                            title="Please enter 10-15 digits only (no spaces or special characters)"
+                            placeholder="1234567890" oninput="this.value = this.value.replace(/[^0-9]/g, '')">
+                        <small
+                            style="color: var(--text-secondary); font-size: 0.85rem; display: block; margin-top: 0.25rem;">
+                            📱 Enter 10-15 digits only
+                        </small>
+                    </div>
+
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                        <div class="form-group">
+                            <label class="form-label" for="date">Date *</label>
+                            <input type="date" class="form-input" id="date" name="date" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label" for="time">Time *</label>
+                            <input type="time" class="form-input" id="time" name="time" required>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" for="guests">Number of Guests *</label>
+                        <select class="form-select" id="guests" name="guests" required>
+                            <option value="">Select...</option>
+                            <option value="1">1 Guest</option>
+                            <option value="2">2 Guests</option>
+                            <option value="3">3 Guests</option>
+                            <option value="4">4 Guests</option>
+                            <option value="5">5 Guests</option>
+                            <option value="6">6 Guests</option>
+                            <option value="7">7 Guests</option>
+                            <option value="8">8+ Guests</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" for="table_pref">Table Preference</label>
+                        <select class="form-select" id="table_pref" name="table_pref">
+                            <option value="Any">No Preference</option>
+                            <option value="Window">Window</option>
+                            <option value="Booth">Booth</option>
+                            <option value="Outdoor">Outdoor</option>
+                            <option value="Private">Private Room</option>
+                        </select>
+                    </div>
+
+                    <button type="submit" class="btn" style="width: 100%; margin-top: 1rem;">
+                        Book Now
+                    </button>
+                </form>
+
+                <!-- Success Message -->
+                <div id="success-message" style="display: none; margin-top: 2rem; text-align: center;">
+                    <h3 style="color: var(--success);">✓ Booking Confirmed!</h3>
+                    <div
+                        style="background: var(--bg-tertiary); padding: 1.5rem; border-radius: var(--radius-md); margin: 1rem 0;">
+                        <p style="font-size: 0.9rem; margin-bottom: 0.5rem;">Your Unique Booking ID:</p>
+                        <p style="font-size: 1.8rem; font-weight: 700; color: var(--primary); margin: 0.5rem 0;"
+                            id="booking-id"></p>
+                        <p style="font-size: 0.85rem; color: var(--text-secondary);">Please save this ID for future
+                            reference</p>
+                    </div>
+                    <button class="btn btn-secondary" onclick="location.reload()">Make Another Booking</button>
+                </div>
+
+                <!-- Error Message -->
+                <div id="error-message"
+                    style="display: none; margin-top: 1rem; padding: 1rem; background: #fee; border-radius: 0.5rem; color: var(--danger);">
+                    <strong>Error:</strong> <span id="error-text"></span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-content">
+            <p>© 2024 Mediterranean Delight. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script src="app.js"></script>
+    <script src="chatbot.js"></script>
+    <script>
+        // Set minimum date to today
+        document.getElementById('date').min = new Date().toISOString().split('T')[0];
+
+        // Handle form submission
+        document.getElementById('booking-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const formData = new FormData(e.target);
+            const bookingData = {
+                customer: formData.get('customer'),
+                email: formData.get('email'),
+                phone: formData.get('phone'),
+                date: formData.get('date'),
+                time: formData.get('time'),
+                guests: parseInt(formData.get('guests')),
+                table_pref: formData.get('table_pref')
+            };
+
+            try {
+                const response = await fetch('/api/bookings', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(bookingData)
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    // Show success message
+                    document.getElementById('booking-form').style.display = 'none';
+                    document.getElementById('success-message').style.display = 'block';
+                    document.getElementById('booking-id').textContent = data.booking.id;
+
+                    // Add email confirmation note
+                    const emailNote = document.createElement('p');
+                    emailNote.style.color = 'var(--text-secondary)';
+                    emailNote.innerHTML = `📧 A confirmation email has been sent to <strong>${data.booking.email}</strong>`;
+                    document.getElementById('success-message').appendChild(emailNote);
+                } else {
+                    // Show error message
+                    document.getElementById('error-text').textContent = data.error;
+                    document.getElementById('error-message').style.display = 'block';
+                }
+            } catch (error) {
+                console.error('Booking error:', error);
+                document.getElementById('error-text').textContent = 'Failed to connect to server. Please try again.';
+                document.getElementById('error-message').style.display = 'block';
+            }
+        });
+    </script>
+</body>
+
+</html>
